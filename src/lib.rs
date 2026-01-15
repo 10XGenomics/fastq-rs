@@ -124,9 +124,9 @@ pub use records::{OwnedRecord, Record, RefRecord};
 pub use thread_reader::thread_reader;
 
 #[cfg(fuzzing)]
-const BUFSIZE: usize = 64;
+const DEFAULT_BUFSIZE: usize = 64;
 #[cfg(not(fuzzing))]
-const BUFSIZE: usize = 68 * 1024;
+const DEFAULT_BUFSIZE: usize = 68 * 1024;
 
 /// Parser for fastq files.
 pub struct Parser<R: Read> {
@@ -196,11 +196,16 @@ where
 }
 
 impl<'a, R: 'a + Read> Parser<R> {
-    /// Create a new fastq parser.
+    /// Create a new fastq parser with a default buffer size.
     pub fn new(reader: R) -> Parser<R> {
+        Self::with_buf_size(reader, DEFAULT_BUFSIZE)
+    }
+
+    /// Create a new fastq parser with a configurable buffer size, in bytes.
+    pub fn with_buf_size(reader: R, buf_size: usize) -> Parser<R> {
         Parser {
             reader: reader,
-            buffer: buffer::Buffer::new(BUFSIZE),
+            buffer: buffer::Buffer::new(buf_size),
         }
     }
 
@@ -381,7 +386,7 @@ impl<R: Read> Iterator for RecordSetIter<R> {
                 EmptyBuffer => {
                     self.num_records_guess = records.len() + 1;
 
-                    let buffer = vec![0u8; BUFSIZE].into_boxed_slice();
+                    let buffer = vec![0u8; self.parser.buffer.capacity()].into_boxed_slice();
                     let buffer = self.parser.buffer.replace_buffer(buffer);
                     match self.parser.buffer.read_into(&mut self.parser.reader) {
                         Err(e) => return Some(Err(e)),
@@ -393,7 +398,7 @@ impl<R: Read> Iterator for RecordSetIter<R> {
                 Incomplete => {
                     self.num_records_guess = records.len() + 1;
 
-                    let buffer = vec![0u8; BUFSIZE].into_boxed_slice();
+                    let buffer = vec![0u8; self.parser.buffer.capacity()].into_boxed_slice();
                     let buffer = self.parser.buffer.replace_buffer(buffer);
                     if self.parser.buffer.n_free() == 0 {
                         return Some(Err(Error::new(

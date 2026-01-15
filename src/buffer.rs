@@ -15,6 +15,14 @@ impl Buffer {
         }
     }
 
+    /// The total capacity of the buffer, in bytes.
+    ///
+    /// This is just the capacity of the underlying heap allocation and is
+    /// unrelated to the amount of data already used.
+    pub fn capacity(&self) -> usize {
+        self.data.len()
+    }
+
     pub fn len(&self) -> usize {
         self.end.checked_sub(self.start).unwrap()
     }
