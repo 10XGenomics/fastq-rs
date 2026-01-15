@@ -19,7 +19,7 @@ impl Buffer {
     ///
     /// This is just the capacity of the underlying heap allocation and is
     /// unrelated to the amount of data already used.
-    pub fn capacity(&self) -> usize {
+    pub(crate) fn capacity(&self) -> usize {
         self.data.len()
     }
 
