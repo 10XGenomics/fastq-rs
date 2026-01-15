@@ -352,7 +352,7 @@ impl<'a> Iterator for RecordSetItems<'a> {
     }
 }
 
-struct RecordSetIter<R: Read> {
+pub struct RecordSetIter<R: Read> {
     parser: Parser<R>,
     num_records_guess: usize,
     reader_at_end: bool,
@@ -427,7 +427,7 @@ impl<R: Read> Iterator for RecordSetIter<R> {
 
 impl<R: Read> Parser<R> {
     /// Return the fastq records in chunks.
-    fn record_sets(self) -> RecordSetIter<R> {
+    pub fn record_sets(self) -> RecordSetIter<R> {
         RecordSetIter {
             parser: self,
             reader_at_end: false,
