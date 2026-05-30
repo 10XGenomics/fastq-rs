@@ -11,7 +11,7 @@ keywords = ["bio", "fastq", "parser"]
 
 [dependencies]
 memchr = ">=0.1"
-niffler = { version = ">=2.4.0" }
+niffler = { version = ">=2", default-features = false }
 
 [dev-dependencies]
 parasailors = ">=0.3"
